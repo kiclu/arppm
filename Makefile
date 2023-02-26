@@ -1,9 +1,9 @@
 DIR_BUILD = build
 DIR_INC	  = h
 
-ARPPM_IMG = arppm
-ARPPM_ASM = arppm.asm
-ARPPM_MIF = arppm.mif
+ARPPM_IMG 		= arppm
+ARPPM_ASM 		= arppm.asm
+ARPPM_MIFDUMP	= arppm.mifdump
 
 # Try to infer the correct TOOLPREFIX if not set
 ifndef TOOLPREFIX
@@ -67,26 +67,21 @@ strip:
 	@${STRIP} -R .comment ${ARPPM_IMG}
 
 textdump: all
-	${OBJDUMP} -D -S ${ARPPM_IMG} --prefix-addresses --show-raw-insn | tail -n +5 > dump.asm
+	${OBJDUMP} -D -S ${ARPPM_IMG} --prefix-addresses --show-raw-insn > dump.asm
 
 mifdump: strip
-	@${OBJDUMP} -D -S ${ARPPM_IMG} --prefix-addresses --show-raw-insn | grep 0x | cut -d ' ' -f 1,2
-
-mifgen: strip
-	@echo "DEPTH = 4096;" > ${ARPPM_MIF}
-	@echo "WIDTH = 32;" >> ${ARPPM_MIF}
-	@echo "ADDRESS_RADIX = HEX;" >> ${ARPPM_MIF}
-	@echo "DATA_RADIX = HEX;" >> ${ARPPM_MIF}
-	@echo "CONTENT" >> ${ARPPM_MIF}
-	@echo "BEGIN" >> ${ARPPM_MIF}
-	@${OBJDUMP} -D -S ${ARPPM_IMG} --prefix-addresses --show-raw-insn | grep 0x | cut -d ' ' -f 1,2 | sed 's/0x//g' | sed 's/ / : /g' >> ${ARPPM_MIF}
-	@echo "END;" >> ${ARPPM_MIF}
+	rm -f ${ARPPM_MIFDUMP}
+	@${OBJDUMP} -D -S ${ARPPM_IMG} --prefix-addresses --show-raw-insn | grep 0x | cut -d ' ' -f 1,2 | sed 's/0x//g' | sed 's/ / : /g' >> ${ARPPM_MIFDUMP}
 	
+mif: mifdump
+	@python3 mifgen/mifgen.py ${ARPPM_MIFDUMP} ${ARPPM_IMG}.mif
 
 clean:
 	rm -f ${ARPPM_IMG} ${ARPPM_ASM}
 	rm -fr ${DIR_BUILD}
 	rm -f *.asm
+	rm -f *.mif
+	rm -f *.mifdump
 
 
 .PRECIOUS: %.o
