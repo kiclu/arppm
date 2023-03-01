@@ -1,0 +1,12 @@
+# DO NOT EDIT/REMOVE THIS FILE!
+# _start function is set up to be at address 0x0000 because PC is initialized
+# to zero at startup. Use main() function as you would with any other C program.
+# _start also initializes stack pointer to 0x8000.
+
+.globl _start
+.globl main
+.align 4
+
+_start:
+    li sp, 0x8000
+    call _start
