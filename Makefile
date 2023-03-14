@@ -1,5 +1,6 @@
 DIR_BUILD = build
 DIR_INC	  = h
+DIR_SRC	  = src
 
 ARPPM_IMG 		= arppm
 ARPPM_ASM 		= arppm.asm
@@ -29,6 +30,7 @@ ASFLAGS	= -g -march=rv32i -mabi=ilp32
 
 CFLAGS += -nostdlib
 CFLAGS += -march=rv32i -mabi=ilp32
+# CFLAGS += -O3
 
 LDSCRIPT = arppm.ld
 LDFLAGS  = -m elf32lriscv -T ${LDSCRIPT}
@@ -82,7 +84,7 @@ clean:
 	rm -f *.asm
 	rm -f *.mif
 	rm -f *.mifdump
-
+	rm -f ${DIR_SRC}/*.s
 
 .PRECIOUS: %.o
 

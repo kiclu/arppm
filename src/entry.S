@@ -8,5 +8,6 @@
 .align 4
 
 _start:
-    li sp, 0x8000
-    call _start
+    nop             # buffer time for board to initialize
+    li sp, 0x8000   # initialize stack pointer
+    j main          # jump to main
