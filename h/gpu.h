@@ -14,7 +14,7 @@
 #include<stdint.h>
 
 typedef struct {
-    uint32_t data[2];
+    uint32_t data[8];
 } sprite_t;
 
 // check csr ready bit and draw pixel
@@ -27,6 +27,6 @@ extern int ccsrdln(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1, uint16_t 
 extern int ccsrdrct(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1, uint16_t color);
 
 // check csr ready bit and draw sprite
-// extern int ccsrdspr(uint32_t x, uint32_t y, uint16_t color);
+extern int ccsrdspr(uint32_t x, uint32_t y, uint16_t color, sprite_t* sprite);
 
 #endif//_ARP_GPU_H
