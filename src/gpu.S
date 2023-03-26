@@ -1,3 +1,4 @@
+.globl gpu_init
 .globl ccsrdpx
 .globl ccsrdln
 .globl ccsrdrct
@@ -14,8 +15,8 @@
 # csr[6] = draw rectangle
 # csr[7] = draw sprite
 
-gpuinit:
-    lui     a1, 0x40000
+gpu_init:
+    lui     a1, 0x10
     li      a0, 0x01
     sw      a0, 0x0(a1)
     lw      a0, 0x0(a1)
@@ -27,7 +28,7 @@ gpuinit:
 # a1 = y
 # a2 = color
 ccsrdpx:
-    lui     a3, 0x40000
+    lui     a3, 0x10
     lw      a4, 0x0(a3)         # read csr
     and     a4, a4, 0b1         # check ready bit
     bnez    a4, dpx             # if ready then draw pixel
@@ -51,7 +52,7 @@ dpx:
 # a3 = y1
 # a4 = color
 ccsrdln:
-    lui     a5, 0x40000
+    lui     a5, 0x10
     lw      a6, 0x0(a5)         # read csr
     and     a6, a6, 0b1         # check ready bit
     bnez    a6, dln             # if ready then draw line
@@ -78,7 +79,7 @@ dln:
 # a3 = y1
 # a4 = color
 ccsrdrct:
-    lui     a5, 0x40000
+    lui     a5, 0x10
     lw      a6, 0x0(a5)         # read csr
     and     a6, a6, 0b1         # check ready bit
     bnez    a6, drct            # if ready then draw rectangle
@@ -103,7 +104,7 @@ drct:
 # a2 = color
 # a3 = &sprite
 ccsrdspr:
-    lui     a4, 0x40000
+    lui     a4, 0x10
     lw      a5, 0x0(a4)         # read csr
     and     a5, a5, 0b1         # check ready bit
     bnez    a5, dspr            # if ready then draw sprite
@@ -135,7 +136,7 @@ dspr:
 
     lw      a6, 0x18(a3)        # read sprite[6]
     sw      a6, 0x28(a4)        # write sprite[6]
-    
+
     lw      a6, 0x1C(a3)        # read sprite[7]
     sw      a6, 0x2C(a4)        # write sprite[7]
     

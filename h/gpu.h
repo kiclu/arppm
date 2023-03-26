@@ -10,6 +10,12 @@
 #define GPU_COLOR_ADDR      0xF00C
 #define GPU_SPRITE0_ADDR    0xF010
 #define GPU_SPRITE1_ADDR    0xF014
+#define GPU_SPRITE2_ADDR    0xF018
+#define GPU_SPRITE3_ADDR    0xF01C
+#define GPU_SPRITE4_ADDR    0xF020
+#define GPU_SPRITE5_ADDR    0xF024
+#define GPU_SPRITE6_ADDR    0xF028
+#define GPU_SPRITE7_ADDR    0xF02C
 
 #include<stdint.h>
 
@@ -27,6 +33,8 @@ extern int ccsrdln(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1, uint16_t 
 extern int ccsrdrct(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1, uint16_t color);
 
 // check csr ready bit and draw sprite
-extern int ccsrdspr(uint32_t x, uint32_t y, uint16_t color, sprite_t* sprite);
+extern int ccsrdspr(uint32_t x, uint32_t y, uint16_t color, const sprite_t* sprite);
+
+extern void gpu_init();
 
 #endif//_ARP_GPU_H
