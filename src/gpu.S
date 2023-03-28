@@ -1,17 +1,20 @@
 .globl gpu_init
 .globl ccsrdpx
-.globl ccsrdln
+.globl ccsrdlnoct0
+.globl ccsrdlnoct1
+.globl ccsrdlnoct2
+.globl ccsrdlnoct3
 .globl ccsrdrct
 .globl ccsrdspr
 .align 4
 
 # csr register bits:
 # csr[0] = ready
-# csr[1] = -
-# csr[2] = -
-# csr[3] = -
-# csr[4] = draw pixel
-# csr[5] = draw line
+# csr[1] = draw pixel
+# csr[2] = draw line (octant 0)
+# csr[3] = draw line (octant 1)
+# csr[4] = draw line (octant 2)
+# csr[5] = draw line (octant 3)
 # csr[6] = draw rectangle
 # csr[7] = draw sprite
 
@@ -44,21 +47,21 @@ dpx:
     li      a0, 0
     ret
 
-# check csr ready bit and draw line
-# int ccsrdln(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1, uint32_t color)
+# check csr ready bit and draw line (octant 0)
+# int ccsrdlnoct0(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1, uint32_t color)
 # a0 = x0
 # a1 = y0
 # a2 = x1
 # a3 = y1
 # a4 = color
-ccsrdln:
+ccsrdlnoct0:
     lui     a5, 0x10
     lw      a6, 0x0(a5)         # read csr
     and     a6, a6, 0b1         # check ready bit
-    bnez    a6, dln             # if ready then draw line
+    bnez    a6, dlnoct0         # if ready then draw line
     li      a0, 1               # else return 1
     ret
-dln:
+dlnoct0:
     sll     a1, a1, 11          # px_addr0 = y0 << 11 | x0
     or      a1, a1, a0
     sw      a1, 0x4(a5)         # write px_addr0
@@ -66,7 +69,88 @@ dln:
     or      a3, a3, a2
     sw      a3, 0x8(a5)         # write px_addr1
     sw      a4, 0xC(a5)         # write color
-    or      a4, a4, 0x20        # set command
+    or      a4, a4, 0x02        # set command
+    sw      a4, 0x0(a3)         # write csr
+    li      a0, 0
+    ret
+
+# check csr ready bit and draw line (octant 1)
+# int ccsrdlnonct1(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1, uint32_t color)
+# a0 = x0
+# a1 = y0
+# a2 = x1
+# a3 = y1
+# a4 = color
+ccsrdlnoct1:
+    lui     a5, 0x10
+    lw      a6, 0x0(a5)         # read csr
+    and     a6, a6, 0b1         # check ready bit
+    bnez    a6, dlnoct1         # if ready then draw line
+    li      a0, 1               # else return 1
+    ret
+dlnoct1:
+    sll     a1, a1, 11          # px_addr0 = y0 << 11 | x0
+    or      a1, a1, a0
+    sw      a1, 0x4(a5)         # write px_addr0
+    sll     a3, a3, 11          # px_addr1 = y1 << 11 | x1
+    or      a3, a3, a2
+    sw      a3, 0x8(a5)         # write px_addr1
+    sw      a4, 0xC(a5)         # write color
+    or      a4, a4, 0x04        # set command
+    sw      a4, 0x0(a3)         # write csr
+    li      a0, 0
+    ret
+
+# check csr ready bit and draw line (octant 2)
+# int ccsrdlnoct2(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1, uint32_t color)
+# a0 = x0
+# a1 = y0
+# a2 = x1
+# a3 = y1
+# a4 = color
+ccsrdlnoct2:
+    lui     a5, 0x10
+    lw      a6, 0x0(a5)         # read csr
+    and     a6, a6, 0b1         # check ready bit
+    bnez    a6, dlnoct2         # if ready then draw line
+    li      a0, 1               # else return 1
+    ret
+dlnoct2:
+    sll     a1, a1, 11          # px_addr0 = y0 << 11 | x0
+    or      a1, a1, a0
+    sw      a1, 0x4(a5)         # write px_addr0
+    sll     a3, a3, 11          # px_addr1 = y1 << 11 | x1
+    or      a3, a3, a2
+    sw      a3, 0x8(a5)         # write px_addr1
+    sw      a4, 0xC(a5)         # write color
+    or      a4, a4, 0x08        # set command
+    sw      a4, 0x0(a3)         # write csr
+    li      a0, 0
+    ret
+
+# check csr ready bit and draw line (octant 3)
+# int ccsrdlnoct3(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1, uint32_t color)
+# a0 = x0
+# a1 = y0
+# a2 = x1
+# a3 = y1
+# a4 = color
+ccsrdlnoct3:
+    lui     a5, 0x10
+    lw      a6, 0x0(a5)         # read csr
+    and     a6, a6, 0b1         # check ready bit
+    bnez    a6, dlnoct3         # if ready then draw line
+    li      a0, 1               # else return 1
+    ret
+dlnoct3:
+    sll     a1, a1, 11          # px_addr0 = y0 << 11 | x0
+    or      a1, a1, a0
+    sw      a1, 0x4(a5)         # write px_addr0
+    sll     a3, a3, 11          # px_addr1 = y1 << 11 | x1
+    or      a3, a3, a2
+    sw      a3, 0x8(a5)         # write px_addr1
+    sw      a4, 0xC(a5)         # write color
+    or      a4, a4, 0x10        # set command
     sw      a4, 0x0(a3)         # write csr
     li      a0, 0
     ret

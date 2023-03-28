@@ -5,9 +5,11 @@
 
 .globl _start
 .globl main
+.extern gpu_init
 .align 4
 
 _start:
     nop             # buffer time for board to initialize
     li sp, 0x8000   # initialize stack pointer
+    call gpu_init   # initialize GPU
     j main          # jump to main
