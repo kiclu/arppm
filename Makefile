@@ -28,9 +28,9 @@ OBJDUMP = ${TOOLPREFIX}objdump
 
 ASFLAGS	= -g -march=rv32i -mabi=ilp32
 
-CFLAGS += -nostdlib
+CFLAGS += -nostdlib -Ih
 CFLAGS += -march=rv32i -mabi=ilp32
-CFLAGS += -O3 -Ih
+CFLAGS += -O3
 
 LDSCRIPT = arppm.ld
 LDFLAGS  = -m elf32lriscv -T ${LDSCRIPT}

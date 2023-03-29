@@ -42,7 +42,7 @@ dpx:
     or      a1, a1, a0
     sw      a1, 0x4(a3)         # write px_addr
     sw      a2, 0xC(a3)         # write color
-    or      a4, a4, 0x10        # set command
+    or      a4, a4, 0x02        # set command
     sw      a4, 0x0(a3)         # write csr
     li      a0, 0
     ret
@@ -69,8 +69,8 @@ dlnoct0:
     or      a3, a3, a2
     sw      a3, 0x8(a5)         # write px_addr1
     sw      a4, 0xC(a5)         # write color
-    or      a4, a4, 0x02        # set command
-    sw      a4, 0x0(a3)         # write csr
+    or      a6, a6, 0x04        # set command
+    sw      a6, 0x0(a5)         # write csr
     li      a0, 0
     ret
 
@@ -96,8 +96,8 @@ dlnoct1:
     or      a3, a3, a2
     sw      a3, 0x8(a5)         # write px_addr1
     sw      a4, 0xC(a5)         # write color
-    or      a4, a4, 0x04        # set command
-    sw      a4, 0x0(a3)         # write csr
+    or      a6, a6, 0x08        # set command
+    sw      a6, 0x0(a5)         # write csr
     li      a0, 0
     ret
 
@@ -123,8 +123,8 @@ dlnoct2:
     or      a3, a3, a2
     sw      a3, 0x8(a5)         # write px_addr1
     sw      a4, 0xC(a5)         # write color
-    or      a4, a4, 0x08        # set command
-    sw      a4, 0x0(a3)         # write csr
+    or      a6, a6, 0x10        # set command
+    sw      a6, 0x0(a5)         # write csr
     li      a0, 0
     ret
 
@@ -150,8 +150,8 @@ dlnoct3:
     or      a3, a3, a2
     sw      a3, 0x8(a5)         # write px_addr1
     sw      a4, 0xC(a5)         # write color
-    or      a4, a4, 0x10        # set command
-    sw      a4, 0x0(a3)         # write csr
+    or      a6, a6, 0x20        # set command
+    sw      a6, 0x0(a5)         # write csr
     li      a0, 0
     ret
 
@@ -177,8 +177,8 @@ drct:
     or      a3, a3, a2
     sw      a3, 0x8(a5)         # write px_addr1
     sw      a4, 0xC(a5)         # write color
-    or      a4, a4, 0x40        # set command
-    sw      a4, 0x0(a5)         # write csr
+    or      a6, a6, 0x40        # set command
+    sw      a6, 0x0(a5)         # write csr
     ret
 
 # check csr ready bit and draw sprite
