@@ -1,6 +1,11 @@
 #include<dbgif.h>
 
+static uint32_t reverse(uint32_t data){
+    return ((data & 0xF) << 12) | ((data & 0xF0) << 4) | ((data & 0xF00) >> 4) | ((data & 0xF000) >> 12);
+}
+
 void dbgif_print_hex(uint32_t val, uint8_t reg){
+    val = reverse(val);
     uint32_t data = 0;
     for(uint32_t i = 0; i < 4; i++){
         switch(val & 0xF){
