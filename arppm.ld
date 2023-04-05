@@ -3,9 +3,9 @@ ENTRY( _start )
 
 MEMORY
 {
-    INST    (rx)    : ORIGIN = 0x0000, LENGTH = 0x3000
-    RODATA  (r)     : ORIGIN = 0x3000, LENGTH = 0x2000
-    SRODATA (r)     : ORIGIN = 0x5000, LENGTH = 0x2000
+    INST    (rx)    : ORIGIN = 0x0000, LENGTH = 0x4000
+    RODATA  (r)     : ORIGIN = 0x4000, LENGTH = 0x2000
+    SRODATA (r)     : ORIGIN = 0x6000, LENGTH = 0x1000
     DATA    (rw)    : ORIGIN = 0x7000, LENGTH = 0x0400
     BSS     (rw)    : ORIGIN = 0x7400, LENGTH = 0x0400
     STACK   (rw)    : ORIGIN = 0x7800, LENGTH = 0x0800
