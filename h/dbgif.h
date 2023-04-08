@@ -5,6 +5,6 @@
 
 #include<stdint.h>
 
-void dbgif_print_hex(uint16_t val, uint8_t reg);
+void dbgif_print_hex(uint32_t val, uint8_t reg);
 
 #endif//_ARP_7SEG_H

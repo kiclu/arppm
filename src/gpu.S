@@ -8,6 +8,20 @@
 .globl ccsrdspr
 .align 4
 
+# gpu memory mapped register addresses:
+# csr       = 0x10000
+# coord0    = 0x10004
+# coord1    = 0x10008
+# color     = 0x1000C
+# spr0      = 0x10010
+# spr1      = 0x10014
+# spr2      = 0x10018
+# spr3      = 0x1001C
+# spr4      = 0x10020
+# spr5      = 0x10024
+# spr6      = 0x10028
+# spr7      = 0x1002C
+
 # csr register bits:
 # csr[0] = ready
 # csr[1] = draw pixel
@@ -42,7 +56,7 @@ dpx:
     or      a1, a1, a0
     sw      a1, 0x4(a3)         # write px_addr
     sw      a2, 0xC(a3)         # write color
-    or      a4, a4, 0x10        # set command
+    li      a4, 0x02            # set command
     sw      a4, 0x0(a3)         # write csr
     li      a0, 0
     ret
@@ -69,8 +83,8 @@ dlnoct0:
     or      a3, a3, a2
     sw      a3, 0x8(a5)         # write px_addr1
     sw      a4, 0xC(a5)         # write color
-    or      a4, a4, 0x02        # set command
-    sw      a4, 0x0(a3)         # write csr
+    li      a6, 0x04            # set command
+    sw      a6, 0x0(a5)         # write csr
     li      a0, 0
     ret
 
@@ -96,8 +110,8 @@ dlnoct1:
     or      a3, a3, a2
     sw      a3, 0x8(a5)         # write px_addr1
     sw      a4, 0xC(a5)         # write color
-    or      a4, a4, 0x04        # set command
-    sw      a4, 0x0(a3)         # write csr
+    li      a6, 0x08            # set command
+    sw      a6, 0x0(a5)         # write csr
     li      a0, 0
     ret
 
@@ -123,8 +137,8 @@ dlnoct2:
     or      a3, a3, a2
     sw      a3, 0x8(a5)         # write px_addr1
     sw      a4, 0xC(a5)         # write color
-    or      a4, a4, 0x08        # set command
-    sw      a4, 0x0(a3)         # write csr
+    li      a6, 0x10            # set command
+    sw      a6, 0x0(a5)         # write csr
     li      a0, 0
     ret
 
@@ -150,8 +164,8 @@ dlnoct3:
     or      a3, a3, a2
     sw      a3, 0x8(a5)         # write px_addr1
     sw      a4, 0xC(a5)         # write color
-    or      a4, a4, 0x10        # set command
-    sw      a4, 0x0(a3)         # write csr
+    li      a6, 0x20            # set command
+    sw      a6, 0x0(a5)         # write csr
     li      a0, 0
     ret
 
@@ -177,12 +191,13 @@ drct:
     or      a3, a3, a2
     sw      a3, 0x8(a5)         # write px_addr1
     sw      a4, 0xC(a5)         # write color
-    or      a4, a4, 0x40        # set command
-    sw      a4, 0x0(a5)         # write csr
+    li      a6, 0x40            # set command
+    sw      a6, 0x0(a5)         # write csr
+    li      a0, 0
     ret
 
 # check csr ready bit and draw sprite
-# int ccsrdsp(uint32_t x, uint32_t y, uint32_t color, sprite_t* sprite)
+# int ccsrdspr(uint32_t x, uint32_t y, uint32_t color, sprite_t* sprite)
 # a0 = x
 # a1 = y
 # a2 = color
@@ -199,7 +214,7 @@ dspr:
     or      a1, a1, a0
     sw      a1, 0x4(a4)         # write px_addr
     sw      a2, 0xC(a4)         # write color
-    
+
     lw      a6, 0x00(a3)        # read sprite[0]
     sw      a6, 0x10(a4)        # write sprite[0]
 
@@ -224,6 +239,7 @@ dspr:
     lw      a6, 0x1C(a3)        # read sprite[7]
     sw      a6, 0x2C(a4)        # write sprite[7]
     
-    or      a5, a5, 0x80        # set command
+    li      a5, 0x80            # set command
     sw      a5, 0x0(a4)         # write csr
+    li      a0, 0
     ret

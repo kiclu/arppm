@@ -3,8 +3,9 @@ DIR_INC	  = h
 DIR_SRC	  = src
 
 ARPPM_IMG 		= arppm
+ARPPM_MIF		= arppm.mif
 ARPPM_ASM 		= arppm.asm
-ARPPM_MIFDUMP	= arppm.mifdump
+ARPPM_OBJDUMP	= arppm.od
 
 # Try to infer the correct TOOLPREFIX if not set
 ifndef TOOLPREFIX
@@ -28,9 +29,10 @@ OBJDUMP = ${TOOLPREFIX}objdump
 
 ASFLAGS	= -g -march=rv32i -mabi=ilp32
 
-CFLAGS += -nostdlib
+CFLAGS += -nostdlib -Ih
 CFLAGS += -march=rv32i -mabi=ilp32
-CFLAGS += -O3 -Ih
+CFLAGS += -O3
+# CFLAGS += -fno-builtin
 
 LDSCRIPT = arppm.ld
 LDFLAGS  = -m elf32lriscv -T ${LDSCRIPT}
@@ -68,22 +70,16 @@ strip:
 #	${STRIP} -R .sbss ${ARPPM_IMG}
 	@${STRIP} -R .comment ${ARPPM_IMG}
 
-textdump: all
-	${OBJDUMP} -D -S ${ARPPM_IMG} --prefix-addresses --show-raw-insn > dump.asm
-
-mifdump: strip
-	rm -f ${ARPPM_MIFDUMP}
-	@${OBJDUMP} -D -S ${ARPPM_IMG} --prefix-addresses --show-raw-insn | grep 0x | cut -d ' ' -f 1,2 | sed 's/0x//g' | sed 's/ / : /g' >> ${ARPPM_MIFDUMP}
-	
-mif: mifdump
-	@python3 mifgen/mifgen.py ${ARPPM_MIFDUMP} ${ARPPM_IMG}.mif
+mif: all strip
+	${OBJDUMP} -z --full-contents ${ARPPM_IMG} | cut -d ' ' -f 2,3,4,5,6 | grep -E '[[:digit:]]' > ${ARPPM_OBJDUMP}
+	@python3 mifgen/mifgen.py ${ARPPM_OBJDUMP} ${ARPPM_MIF}
 
 clean:
 	rm -f ${ARPPM_IMG} ${ARPPM_ASM}
 	rm -fr ${DIR_BUILD}
 	rm -f *.asm
 	rm -f *.mif
-	rm -f *.mifdump
+	rm -f *.od
 	rm -f ${DIR_SRC}/*.s
 
 .PRECIOUS: %.o
