@@ -50,15 +50,16 @@ const sprite_t pacman_sprite[4][2] = {
 
 const sprite_t ghost_sprite[2] = {
     {
-        0x03C00000, 0x1FF80FF0, 0x3FFC3FFC, 0x7FFE3FFC,
-        0x7FFE7FFE, 0x7FFE7FFE, 0x7FFE7FFE, 0x46626E76
+        0x0FF003C0, 0x3FFC1FF8, 0x3FFC3FFC, 0x7FFE7FFE,
+        0x7FFE7FFE, 0x7FFE7FFE, 0x6E767FFE, 0x00004662
     },
     {
-        0x03C00000, 0x1FF80FF0, 0x3FFC3FFC, 0x7FFE3FFC,
-        0x7FFE7FFE, 0x7FFE7FFE, 0x7FFE7FFE, 0x318C7BDE
+        0x0FF003C0, 0x3FFC1FF8, 0x3FFC3FFC, 0x7FFE7FFE,
+        0x7FFE7FFE, 0x7FFE7FFE, 0x7BDE7FFE, 0x0000318C
     }
 };
 
+// TODO: move up one pixel
 const sprite_t eyes_sprite[4] = {
     // direction UP
     {
@@ -82,6 +83,7 @@ const sprite_t eyes_sprite[4] = {
     },
 };
 
+// TODO: move up one pixel
 const sprite_t pupils_sprite[4] = {
     // direction UP
     {

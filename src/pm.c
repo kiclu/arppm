@@ -21,7 +21,7 @@ typedef struct {
     uint32_t y1;
 } line_t;
 
-const uint32_t map_line_count = 178;
+const uint32_t map_line_count = 188;
 const uint32_t map_line_color = 0x11C;
 const line_t map_line[] = {
     // upper border [9]
@@ -63,6 +63,18 @@ const line_t map_line[] = {
     {367, 211, 431, 211},
 
     // upper left blocks []
+    {31, 35, 31, 211},
+    {47, 35, 47, 195},
+    {223, 195, 223, 211},
+    {31, 35, 47, 35},
+    {47, 195, 223, 195},
+    {31, 211, 223, 211},
+
+    {127, 227, 127, 291},
+    {223, 227, 223, 291},
+    {127, 227, 223, 227},
+    {127, 291, 223, 291},
+
     {31, 227, 31, 243},
     {95, 243, 95, 291},
     {111, 227, 111, 291},
@@ -591,6 +603,7 @@ static int check_pm_eaten(const pacman_t* pm, const ghost_t* ghosts){
 }
 
 static void update_ghosts(ghost_t* ghosts, const pacman_t* pm){
+    if(time & 0b11 == 0) return;
     for(uint32_t i = 0; i < 4; ++i){
         if(!ghosts[i].is_released){
             if(ghosts[i].pos_y == 420) ghosts[i].dir = DOWN;
@@ -616,10 +629,10 @@ void run(){
 
         pacman_t pm = {392, 372, RIGHT, RIGHT, 1, 0};
         ghost_t ghosts[4] = {
-            {368, 420, RIGHT, RIGHT, 1, 0xF00, 0, 0},  // blinky
-            {384, 436, RIGHT, RIGHT, 1, 0xFCF, 0, 0},  // pinky
-            {400, 420, RIGHT, RIGHT, 1, 0x0FF, 0, 0},  // inky
-            {416, 436, RIGHT, RIGHT, 1, 0xFC5, 0, 0}   // clyde
+            {368, 420, DOWN, DOWN, 0, 0xF00, 0, 0},  // blinky
+            {384, 436, UP, UP, 0, 0xFCF, 0, 0},  // pinky
+            {400, 420, DOWN, DOWN, 1, 0x0FF, 0, 0},  // inky
+            {416, 436, UP, UP, 1, 0xFC5, 0, 0}   // clyde
         };
 
         draw_pacman(&pm);
@@ -647,7 +660,7 @@ void run(){
             update_pacman(&pm);
 
             // update ghosts
-            // update_ghosts(ghosts, &pm);
+            update_ghosts(ghosts, &pm);
 
             // check if eaten
             if(check_pm_eaten(&pm, ghosts)){
