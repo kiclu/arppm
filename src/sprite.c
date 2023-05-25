@@ -42,8 +42,8 @@ const sprite_t pacman_sprite[4][2] = {
             0x007E003E, 0x01FC00FC, 0x03E003F8, 0x00000000
         },
         {
-            0x00000000, 0x07C00000, 0x3FF81FF0, 0x0FFC3FF8,
-            0x003C01FC, 0x0FFC01FC, 0x3FF83FF8, 0x07C01FF0
+            0x07C00000, 0x3FF81FF0, 0x0FFC3FF8, 0x003C01FC,
+            0x0FFC01FC, 0x3FF83FF8, 0x07C01FF0, 0x00000000
         }
     }
 };

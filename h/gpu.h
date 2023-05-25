@@ -26,34 +26,32 @@
 // check csr ready bit and draw pixel
 extern int ccsrdpx(uint32_t x, uint32_t y, uint32_t color);
 
-// check csr ready bit and draw line (octant 0)
-extern int ccsrdlnoct0(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1, uint32_t color);
+// check csr ready bit and draw line
+extern int ccsrdln(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1, uint32_t color);
 
-// check csr ready bit and draw line (octant 1)
-extern int ccsrdlnoct1(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1, uint32_t color);
-
-// check csr ready bit and draw line (octant 2)
-extern int ccsrdlnoct2(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1, uint32_t color);
-
-// check csr ready bit and draw line (octant 3)
-extern int ccsrdlnoct3(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1, uint32_t color);
-
-// check csr ready bit draw rectangle
+// check csr ready bit and draw rectangle
 extern int ccsrdrct(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1, uint32_t color);
 
 // check csr ready bit and draw sprite
 extern int ccsrdspr(uint32_t x, uint32_t y, uint32_t color, const sprite_t* sprite);
 
+// enable horizontal draw area
+extern void hdaenable();
+
+// disable horizontal draw area
+extern void hdadisable();
+
 // wrapper functions
 
-// check csr ready bit and draw line
-int ccsrdln(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1, uint32_t color);
-
 // check csr ready bit and draw horizontal line
-int ccsrdhln(uint32_t x0, uint32_t x1, uint32_t y, uint32_t color);
+inline int ccsrdhln(uint32_t x0, uint32_t x1, uint32_t y, uint32_t color){
+    return ccsrdln(x0, y, x1, y, color);
+}
 
 // check csr ready bit and draw vertical line
-int ccsrdvln(uint32_t x, uint32_t y0, uint32_t y1, uint32_t color);
+inline int ccsrdvln(uint32_t x, uint32_t y0, uint32_t y1, uint32_t color){
+    return ccsrdln(x, y0, x, y1, color);
+}
 
 
 #endif//_ARP_GPU_H

@@ -4,6 +4,7 @@
 #include<pm.h>
 
 [[ noreturn ]] void main(){
+    hdaenable();
     run();
 
     for(;;);

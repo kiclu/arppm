@@ -3,15 +3,8 @@
 
 #include<stdint.h>
 
-enum direction {
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT
-};
+enum direction { UP, DOWN, LEFT, RIGHT };
 
-typedef struct {
-    uint32_t data[8];
-} sprite_t;
+typedef struct { uint32_t data[8]; } sprite_t;
 
 #endif//_ARP_SPRITE_H
