@@ -577,6 +577,7 @@ static void draw_map(){
     draw_map_rects();
 }
 
+// TODO: remove
 static void draw_debug_grid(){
     for(uint32_t i = 19; i <= 579; i += 16){
         while(ccsrdhln(15, 783, i, 0x444));
@@ -891,6 +892,15 @@ static void update_ghosts(ghost_t* ghosts, const pacman_t* pm){
     }
 }
 
+static int restart = 0;
+int check_restart(){
+    if(restart){
+        restart = 0;
+        return 1;
+    }
+    return 0;
+}
+
 static void update_newdir(pacman_t* pm){
     // fetch ps2 buffer contents
     uint32_t ps2_buf = rdps2();
@@ -900,19 +910,23 @@ static void update_newdir(pacman_t* pm){
     // find first valid key
     uint32_t mask = 0xFF000000;
     for(uint32_t sh = 24; ; sh -= 8){
+        if((ps2_buf & mask) >> (sh + 8) == 0xF0){
+            sh >>= 8;
+        }
         switch((ps2_buf & mask) >> sh){
             case 0x00: return;
             case 0x1B: pm->newdir = DOWN;   return;
             case 0x1C: pm->newdir = LEFT;   return;
             case 0x1D: pm->newdir = UP;     return;
             case 0x23: pm->newdir = RIGHT;  return;
-            case 0xF0: mask >>= 8;
+            case 0x2D: restart = 1; return;
             default:   mask >>= 8;
         }
     }
 }
 
 void run(){
+run:
     for(uint32_t hp = 3; hp > 0; --hp){
         clear_screen();
         draw_map();
@@ -959,6 +973,8 @@ void run(){
             // fetch keyboard inputs and decode them
             update_newdir(&pm);
 
+            if(check_restart()) goto run;
+
             // update pacman
             update_pacman(&pm);
 
@@ -981,5 +997,7 @@ void run(){
     clear_screen();
     draw_map();
 
-    for(;;);
+    for(;;){
+        if(check_restart()) goto run;
+    }
 }
