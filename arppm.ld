@@ -7,8 +7,8 @@ MEMORY
     RODATA  (r)     : ORIGIN = 0x4000, LENGTH = 0x3600
     SRODATA (r)     : ORIGIN = 0x7600, LENGTH = 0x0200
     DATA    (rw)    : ORIGIN = 0x7800, LENGTH = 0x0200
-    BSS     (rw)    : ORIGIN = 0x7A00, LENGTH = 0x0200
-    STACK   (rw)    : ORIGIN = 0x7C00, LENGTH = 0x0400
+    BSS     (rw)    : ORIGIN = 0x7A00, LENGTH = 0x0300
+    STACK   (rw)    : ORIGIN = 0x7D00, LENGTH = 0x0300
 }
 
 SECTIONS
