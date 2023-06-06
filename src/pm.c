@@ -562,13 +562,15 @@ static inline void clear_dot_eaten(){
 
 static void draw_map_dots(){
     for(uint32_t i = 0; i < map_dot_count; ++i){
-        while(ccsrdrct(
-            map_dots[i].x,
-            map_dots[i].y,
-            map_dots[i].x + 2,
-            map_dots[i].y + 2,
-            map_dot_color
-        ));
+        if(!check_dot_eaten(i)){
+            while(ccsrdrct(
+                map_dots[i].x,
+                map_dots[i].y,
+                map_dots[i].x + 2,
+                map_dots[i].y + 2,
+                map_dot_color
+            ));
+        }
     }
 }
 
@@ -950,8 +952,11 @@ void draw_score(){
     score_prev = score;
 }
 
-static uint32_t dot_clear_queue[64];
+static uint32_t dot_clear_queue[16];
 static uint32_t dcq_k = 0;
+
+static uint32_t dot_restore_queue[16];
+static uint32_t drq_k = 0;
 
 static void update_dots(ghost_t* ghosts, pacman_t* pm){
     for(register uint32_t i = 0; i < map_dot_count; ++i){
@@ -968,10 +973,27 @@ static void update_dots(ghost_t* ghosts, pacman_t* pm){
         //     score += 0x10;
         // }
 
-        if(pm->pos_x + 16 > map_dots[i].x && pm->pos_x < map_dots[i].x && pm->pos_y + 16 > map_dots[i].y && pm->pos_y < map_dots[i].y && !check_dot_eaten(i)){
+        if( pm->pos_x + 16 > map_dots[i].x &&
+            pm->pos_x < map_dots[i].x      &&
+            pm->pos_y + 16 > map_dots[i].y &&
+            pm->pos_y < map_dots[i].y      &&
+            !check_dot_eaten(i)
+        ){
             set_dot_eaten(i);
             score += 0x10;
             dot_clear_queue[dcq_k++] = i;
+        }
+
+        for(uint32_t k = 0; k < 4; ++k){
+            if(
+                ghosts[k].pos_x - 8 < map_dots[i].x  &&
+                ghosts[k].pos_x + 32 > map_dots[i].x && 
+                ghosts[k].pos_y - 8 < map_dots[i].y  &&
+                ghosts[k].pos_y + 32 > map_dots[i].y &&
+                !check_dot_eaten(i)
+            ){
+                dot_restore_queue[drq_k++] = i;
+            }
         }
     }
 }
@@ -1020,8 +1042,23 @@ void dot_clear(){
     dcq_k = 0;
 }
 
+void dot_restore(){
+    for(uint32_t i = 0; i < drq_k; ++i){
+        while(ccsrdrct(
+            map_dots[dot_restore_queue[i]].x,
+            map_dots[dot_restore_queue[i]].y,
+            map_dots[dot_restore_queue[i]].x + 2,
+            map_dots[dot_restore_queue[i]].y + 2,
+            0xFFF
+        ));
+    }
+    drq_k = 0;
+}
+
 void run(){
 run:
+    for(uint32_t i = 0; i < 22; ++i) map_dot_eaten[i] = 0;
+
     for(uint32_t hp = 3; hp > 0; --hp){
         clear_screen();
         draw_map();
@@ -1041,9 +1078,6 @@ run:
             release_counter[i] = release_counter_init[i];
         }
 
-        // disable horizontal draw area to minimize sprite tearing
-        // hdadisable();
-
         draw_pacman(&pm);
         draw_ghosts(ghosts);
         draw_score();
@@ -1056,13 +1090,16 @@ run:
 
         for(;;){
             // draw sprites
+            dot_restore();
             draw_pacman(&pm);
             draw_ghosts(ghosts);
+
+            // update score
             draw_score();
 
 
             update_dots(ghosts, &pm);
-            for(uint32_t i = 0; i < 4600; ++i) asm volatile("nop");
+            for(uint32_t i = 0; i < 4600; ++i) asm volatile("nop"); // 4600
 
             // clear sprites
             clear_pacman(&pm);
