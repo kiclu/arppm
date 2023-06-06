@@ -31,8 +31,8 @@ ASFLAGS	= -g -march=rv32i -mabi=ilp32
 
 CFLAGS += -nostdlib -Ih
 CFLAGS += -march=rv32i -mabi=ilp32
-CFLAGS += -O3
-# CFLAGS += -fno-builtin
+CFLAGS += -O2
+CFLAGS += -fno-builtin
 
 LDSCRIPT = arppm.ld
 LDFLAGS  = -m elf32lriscv -T ${LDSCRIPT}

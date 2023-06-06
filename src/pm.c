@@ -9,9 +9,9 @@
 
 static uint32_t time = 0;
 
-const uint32_t background_color = 0x000;
+const uint32_t background_color = 0x001;
 
-static void clear_screen(){
+static inline void clear_screen(){
     while(ccsrdrct(0, 0, GPU_SCREEN_WIDTH, GPU_SCREEN_HEIGHT, background_color));
 }
 
@@ -26,7 +26,7 @@ const uint32_t map_line_count = 265;
 const uint32_t map_line_color = 0x11C;
 const line_t map_line[] = {
     // upper border [9]
-    { 15, 291,  79, 291},
+    {  0, 291,  79, 291},
     { 79, 259,  79, 291},
     { 15, 259,  79, 259},
     { 15,  19,  15, 259},
@@ -34,10 +34,10 @@ const line_t map_line[] = {
     {783,  19, 783, 259},
     {719, 259, 783, 259},
     {719, 259, 719, 291},
-    {719, 291, 783, 291},
+    {719, 291, 799, 291},
 
     // lower border [9]
-    { 15, 307,  79, 307},
+    {  0, 307,  79, 307},
     { 79, 307,  79, 339},
     { 15, 339,  79, 339},
     { 15, 339,  15, 579},
@@ -45,7 +45,7 @@ const line_t map_line[] = {
     {783, 339, 783, 579},
     {719, 339, 783, 339},
     {719, 307, 719, 339},
-    {719, 307, 783, 307},
+    {719, 307, 799, 307},
 
     // center outline [12]
     {271, 227, 271, 371},
@@ -355,7 +355,7 @@ const line_t map_line[] = {
     {351, 451, 447, 451}
 };
 
-static void draw_door(){
+static inline void draw_door(){
     while(ccsrdln(352, 419, 446, 419, 0x666));
 }
 
@@ -383,7 +383,7 @@ typedef struct{
 } rect_t;
 
 const uint32_t map_rect_count = 19;
-const uint32_t map_rect_color = 0x009;
+const uint32_t map_rect_color = 0x11C;
 const rect_t map_rect[] = {
     // A
     {328, 258, 335, 265},
@@ -545,6 +545,21 @@ const dot_t map_dots[] = {
     {742, 570}, {758, 570}, {774, 570}
 };
 
+static uint32_t map_dot_eaten_count = 0;
+static uint32_t map_dot_eaten[22] = {0};
+
+static inline uint32_t check_dot_eaten(uint32_t idx){
+    return (map_dot_eaten[idx >> 5] >> (idx & 0x1FUL)) & 0b1UL;
+}
+
+static inline void set_dot_eaten(uint32_t idx){
+    map_dot_eaten[idx >> 5] |= (0b1UL << (idx & 0x1FUL));
+}
+
+static inline void clear_dot_eaten(){
+    for(uint32_t i = 0; i < map_dot_count >> 5; ++i) map_dot_eaten[i] = 0;
+}
+
 static void draw_map_dots(){
     for(uint32_t i = 0; i < map_dot_count; ++i){
         while(ccsrdrct(
@@ -562,7 +577,7 @@ extern sprite_t ghost_sprite[2];
 extern sprite_t eyes_sprite[4];
 extern sprite_t pupils_sprite[4];
 
-static void draw_hp_counter(uint32_t hp){
+static inline void draw_hp_counter(uint32_t hp){
     switch(hp){
         case 3: while(ccsrdspr(47, 584, 0xFF0, &pacman_sprite[RIGHT][1]));
         case 2: while(ccsrdspr(31, 584, 0xFF0, &pacman_sprite[RIGHT][1]));
@@ -571,26 +586,10 @@ static void draw_hp_counter(uint32_t hp){
     }
 }
 
-static void draw_map(){
+static inline void draw_map(){
     draw_map_lines();
     draw_map_dots();
     draw_map_rects();
-}
-
-// TODO: remove
-static void draw_debug_grid(){
-    for(uint32_t i = 19; i <= 579; i += 16){
-        while(ccsrdhln(15, 783, i, 0x444));
-    }
-    for(uint32_t j = 15; j <= 783; j += 16){
-        while(ccsrdvln(j, 19, 579, 0x444));
-    }
-
-    while(ccsrdhln(0, 800, 0, 0xF00));
-    while(ccsrdhln(0, 800, 600, 0xF00));
-
-    while(ccsrdvln(0, 0, 600, 0xF00));
-    while(ccsrdvln(800, 0, 600, 0xF00));
 }
 
 typedef struct {
@@ -604,7 +603,7 @@ typedef struct {
 
 const uint32_t pacman_color = 0xFF0;
 
-static void draw_pacman(const pacman_t* pm){
+static inline void draw_pacman(const pacman_t* pm){
     while(ccsrdspr(
         pm->pos_x,
         pm->pos_y,
@@ -613,7 +612,7 @@ static void draw_pacman(const pacman_t* pm){
     ));
 }
 
-static void clear_pacman(const pacman_t* pm){
+static inline void clear_pacman(const pacman_t* pm){
     while(ccsrdspr(
         pm->pos_x,
         pm->pos_y,
@@ -888,12 +887,91 @@ static void update_ghosts(ghost_t* ghosts, const pacman_t* pm){
 
             ghosts[i].fr = (time >> 4) & 0b1;
         }
-
     }
 }
 
-static int restart = 0;
-int check_restart(){
+static uint32_t score = 0;
+static uint32_t score_prev = 0;
+static inline uint32_t abs(int32_t x){ return x >= 0 ? x : -x; }
+
+extern sprite_t digit_sprite[16];
+
+void draw_score(){
+    while(ccsrdspr(
+        15,
+        7,
+        background_color,
+        &digit_sprite[(score_prev >> 12) & 0xF]
+    ));
+    while(ccsrdspr(
+        24,
+        7,
+        background_color,
+        &digit_sprite[(score_prev >> 8) & 0xF]
+    ));
+    while(ccsrdspr(
+        33,
+        7,
+        background_color,
+        &digit_sprite[(score_prev >> 4) & 0xF]
+    ));
+    while(ccsrdspr(
+        42,
+        7,
+        background_color,
+        &digit_sprite[score_prev & 0xF]
+    ));
+
+
+    while(ccsrdspr(
+        15,
+        7,
+        0xFFF,
+        &digit_sprite[(score >> 12) & 0xF]
+    ));
+    while(ccsrdspr(
+        24,
+        7,
+        0xFFF,
+        &digit_sprite[(score >> 8) & 0xF]
+    ));
+    while(ccsrdspr(
+        33,
+        7,
+        0xFFF,
+        &digit_sprite[(score >> 4) & 0xF]
+    ));
+    while(ccsrdspr(
+        42,
+        7,
+        0xFFF,
+        &digit_sprite[score & 0xF]
+    ));
+    score_prev = score;
+}
+
+static void update_dots(ghost_t* ghosts, pacman_t* pm){
+    for(register uint32_t i = 0; i < map_dot_count; ++i){
+        int32_t dx = abs(pm->pos_x + 8 - map_dots[i].x);
+        int32_t dy = abs(pm->pos_y + 8 - map_dots[i].y);
+
+        // check if dot in 8 pixel radius of pacman
+        // if true, set dot eaten
+
+        // if(!(dx & ~0x7 | dy & ~0x7) && !check_dot_eaten(i)){
+        //     set_dot_eaten(i);
+        //     score += 0x10;
+        // }
+
+        if(pm->pos_x + 16 > map_dots[i].x && pm->pos_x < map_dots[i].x && pm->pos_y + 16 > map_dots[i].y && pm->pos_y < map_dots[i].y && !check_dot_eaten(i)){
+            set_dot_eaten(i);
+            score += 0x10;
+        }
+    }
+}
+
+static uint32_t restart = 0;
+static inline uint32_t check_restart(){
     if(restart){
         restart = 0;
         return 1;
@@ -904,8 +982,6 @@ int check_restart(){
 static void update_newdir(pacman_t* pm){
     // fetch ps2 buffer contents
     uint32_t ps2_buf = rdps2();
-
-    if(ps2_buf) dbgif_print_hex(ps2_buf >> 16, 0);
 
     // find first valid key
     uint32_t mask = 0xFF000000;
@@ -951,6 +1027,7 @@ run:
 
         draw_pacman(&pm);
         draw_ghosts(ghosts);
+        draw_score();
 
         // start delay
         for(uint32_t i = 0; i < 20000000; ++i) asm volatile("nop");
@@ -962,8 +1039,10 @@ run:
             // draw sprites
             draw_pacman(&pm);
             draw_ghosts(ghosts);
+            draw_score();
 
 
+            update_dots(ghosts, &pm);
             for(uint32_t i = 0; i < 4600; ++i) asm volatile("nop");
 
             // clear sprites
@@ -980,6 +1059,8 @@ run:
 
             // update ghosts
             update_ghosts(ghosts, &pm);
+
+            // update dots
 
             // check if eaten
             if(check_pm_eaten(&pm, ghosts)){
@@ -998,6 +1079,8 @@ run:
     draw_map();
 
     for(;;){
+        pacman_t pm;
+        update_newdir(&pm);
         if(check_restart()) goto run;
     }
 }
