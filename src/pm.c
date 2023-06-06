@@ -503,10 +503,9 @@ run:
             draw_ghosts(ghosts);
 
             // update score
+            update_dots(ghosts, &pm);
             update_score();
 
-
-            update_dots(ghosts, &pm);
             for(uint32_t i = 0; i < 4600; ++i) asm volatile("nop"); // 4600
 
             // clear sprites
@@ -524,8 +523,6 @@ run:
 
             // update ghosts
             update_ghosts(ghosts, &pm);
-
-            // update dots
 
             // check if eaten
             if(check_pm_eaten(&pm, ghosts)){

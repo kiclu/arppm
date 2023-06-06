@@ -33,7 +33,7 @@ typedef struct{
 
 void draw_map_rects();
 
-#define map_dot_count 681
+#define map_dot_count 693
 #define map_dot_color 0xFFF
 
 typedef struct{

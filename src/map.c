@@ -5,7 +5,7 @@ void clear_screen(){
     while(ccsrdrct(0, 0, GPU_SCREEN_WIDTH, GPU_SCREEN_HEIGHT, background_color));
 }
 
-const line_t map_line[] = {
+const line_t map_line[map_line_count] = {
     // upper border [9]
     {  0, 291,  79, 291},
     { 79, 259,  79, 291},
@@ -356,7 +356,7 @@ void draw_map_lines(){
     }
 }
 
-const rect_t map_rect[] = {
+const rect_t map_rect[map_rect_count] = {
     // A
     {328, 258, 335, 265},
     {320, 266, 343, 273},
@@ -404,10 +404,10 @@ void set_dot_eaten(uint32_t idx){
 }
 
 void clear_dot_eaten(){
-    for(uint32_t i = 0; i < map_dot_count >> 5; ++i) map_dot_eaten[i] = 0;
+    for(uint32_t i = 0; i < map_dot_count >> 5 + 1; ++i) map_dot_eaten[i] = 0;
 }
 
-const dot_t map_dots[] = {
+const dot_t map_dots[map_dot_count] = {
     {22,   26}, { 38,  26}, { 54,  26}, { 70,  26}, { 86,  26}, {102,  26},
     {118,  26}, {134,  26}, {150,  26}, {166,  26}, {182,  26}, {198,  26}, 
     {214,  26}, {230,  26}, {246,  26}, {262,  26}, {278,  26}, {294,  26},
@@ -521,7 +521,10 @@ const dot_t map_dots[] = {
     {454, 570}, {470, 570}, {486, 570}, {502, 570}, {518, 570}, {534, 570},
     {550, 570}, {566, 570}, {582, 570}, {598, 570}, {614, 570}, {630, 570},
     {646, 570}, {662, 570}, {678, 570}, {694, 570}, {710, 570}, {726, 570},
-    {742, 570}, {758, 570}, {774, 570}
+    {742, 570}, {758, 570}, {774, 570},
+    { 22, 298}, { 38, 298}, { 54, 298}, { 70, 298},
+    {726, 298}, {742, 298}, {758, 298}, {774, 298},
+    {374, 106}, {390, 106}, {406, 106}, {422, 106}
 };
 
 void draw_map_dots(){
