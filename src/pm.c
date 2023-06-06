@@ -892,7 +892,7 @@ static void update_ghosts(ghost_t* ghosts, const pacman_t* pm){
 
 static uint32_t score = 0;
 static uint32_t score_prev = 0;
-static inline uint32_t abs(int32_t x){ return x >= 0 ? x : -x; }
+static inline int32_t abs(int32_t x){ return x >= 0 ? x : -x; }
 
 extern sprite_t digit_sprite[16];
 
@@ -950,6 +950,9 @@ void draw_score(){
     score_prev = score;
 }
 
+static uint32_t dot_clear_queue[64];
+static uint32_t dcq_k = 0;
+
 static void update_dots(ghost_t* ghosts, pacman_t* pm){
     for(register uint32_t i = 0; i < map_dot_count; ++i){
         int32_t dx = abs(pm->pos_x + 8 - map_dots[i].x);
@@ -958,7 +961,9 @@ static void update_dots(ghost_t* ghosts, pacman_t* pm){
         // check if dot in 8 pixel radius of pacman
         // if true, set dot eaten
 
-        // if(!(dx & ~0x7 | dy & ~0x7) && !check_dot_eaten(i)){
+        // TODO: compare with bitwise ops
+
+        // if(!(dx & ~0x7UL) && !(dy & ~0x7UL) && !check_dot_eaten(i)){
         //     set_dot_eaten(i);
         //     score += 0x10;
         // }
@@ -966,6 +971,7 @@ static void update_dots(ghost_t* ghosts, pacman_t* pm){
         if(pm->pos_x + 16 > map_dots[i].x && pm->pos_x < map_dots[i].x && pm->pos_y + 16 > map_dots[i].y && pm->pos_y < map_dots[i].y && !check_dot_eaten(i)){
             set_dot_eaten(i);
             score += 0x10;
+            dot_clear_queue[dcq_k++] = i;
         }
     }
 }
@@ -999,6 +1005,19 @@ static void update_newdir(pacman_t* pm){
             default:   mask >>= 8;
         }
     }
+}
+
+void dot_clear(){
+    for(uint32_t i = 0; i < dcq_k; ++i){
+        while(ccsrdrct(
+            map_dots[dot_clear_queue[i]].x,
+            map_dots[dot_clear_queue[i]].y,
+            map_dots[dot_clear_queue[i]].x + 2,
+            map_dots[dot_clear_queue[i]].y + 2,
+            0x000
+        ));
+    }
+    dcq_k = 0;
 }
 
 void run(){
@@ -1048,6 +1067,7 @@ run:
             // clear sprites
             clear_pacman(&pm);
             clear_ghosts(ghosts);
+            dot_clear();
 
             // fetch keyboard inputs and decode them
             update_newdir(&pm);
